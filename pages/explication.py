@@ -1,7 +1,7 @@
 import streamlit as st
 import shap
 
-from credit_app import client_list, shap_values
+from credit_app import client_list, shap_values,id_client, expected_value, data_test
 
 idx = client_list.index(id_client)
 shap_user = shap_values[idx]
