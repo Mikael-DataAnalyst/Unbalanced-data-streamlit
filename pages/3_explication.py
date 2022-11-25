@@ -5,7 +5,7 @@ import shap
 import numpy as np
 import matplotlib.pyplot as plt
 
-from credit_app import client_list, shap_values,id_client, expected_value, data_test
+from credit_app import client_list, shap_values, expected_value, data_test
 
 
 st.write('''
@@ -16,7 +16,11 @@ st.write('''
     ''')
 
 idx = st.session_state["idx"]
+id_client = st.session_state["id_client"]
 
+col1 = st.sidebar
+col1.header('Client sélectionné')
+col1.write("Client ID :",str(id_client))
 
 
 
@@ -27,11 +31,6 @@ fig = shap.force_plot(expected_value, shap_values[idx],
                         text_rotation = 45)
 st.pyplot(fig,bbox_inches='tight')
 plt.clf()
-
-'''data_client = data_test.iloc[idx,main_feat_user].round(2)
-data_client["decision_influence"]=shap_values[idx,main_feat_user]
-st.dataframe(data_client)'''
-
 
 shap_user = shap_values[idx]
 shap_user_importance = np.argsort(shap_user)

@@ -4,13 +4,27 @@ import numpy as np
 from credit_app import best_tresh_scoring1, best_tresh_scoring2, feats, model, data_test
 from credit_app import pouce_rouge, pouce_vert, probs
 
+##############
+# Select Box
+##############
+col1 = st.sidebar
+client_list = data_test.index.to_list()
+col1.header("Sélection du client:")
+selection = col1.selectbox(
+        "Quel client ?",
+        client_list
+    )
+# save variables to use on other pages
+st.session_state["id_client"] = selection
+st.session_state["idx"] = client_list.index(selection)
+
 id_client = st.session_state["id_client"]
 idx = st.session_state["idx"]
 col1 = st.sidebar
 col1.header('Client sélectionné')
 col1.write("Client ID :",str(id_client))
 
-option = col1.selectbox(
+option = col1.radio(
     "Quel scoring ?",
     ("Le plus rentable","Le plus de client")
 )
@@ -31,11 +45,11 @@ st.write("""
 
 col1, col2, col3 = st.columns(3)
 if probs[idx][1]<=threshold:
-    col1.image(pouce_vert, width=90)
-    col2.write("Le crédit est accordé")
+    col1.image(pouce_vert, width=150)
+    col2.subheader("Le crédit est accordé")
 else :
-    col1.image(pouce_rouge, width=90)
-    col2.write("Le crédit n'est pas accordé")
+    col1.image(pouce_rouge, width=150)
+    col2.subheader("Le crédit n'est pas accordé")
 # Predict with trained model
 st.write("""
 ## Prédictions de remboursement
