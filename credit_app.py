@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 import pickle
-import json
 
 ##########################
 # Chargement des données #
@@ -22,9 +21,7 @@ with open("data/model.pkl", 'rb') as file:
 col_info = pd.read_csv("data/col_info.csv")
 with open("data/shap_values.pkl", 'rb') as file :
     shap_values = pickle.load(file)
-with open("data/dict_nn.txt") as file :
-    tmp = file.read()
-dict_nn = json.loads(tmp)
+
 
 
 # set variables
@@ -36,6 +33,11 @@ pred_score1 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring1
 pred_score2 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring2
 feats = data_test.columns
 client_list = data_test.index.to_list()
+clients= pd.DataFrame(data_test.index)
+clients["pred_score_1"] = pred_score1
+clients["pred_score_2"] = pred_score2
+clients["prob_1"] = probs[:,1]
+
 st.image(logo)
 ######################
 # Input Text Box
