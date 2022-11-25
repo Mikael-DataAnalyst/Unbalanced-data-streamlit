@@ -39,4 +39,8 @@ feats = data_test.columns
 data_test = data_test.set_index("SK_ID_CURR")
 #data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
 data_test = data_test.drop(data_test.columns[[0]], axis=1)
+
+client_list = data_test.index.to_list()
+
+
 st.image(logo)
