@@ -1,5 +1,6 @@
 import streamlit as st
 import shap
+import numpy as np
 
 from credit_app import client_list, shap_values,id_client, expected_value, data_test
 
