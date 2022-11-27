@@ -1,7 +1,7 @@
 streamlit
 pandas
-PIL
-pickle
+pillow
+
 matplotlib
 shap
-json
+lightgbm
