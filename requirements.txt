@@ -1,5 +1,5 @@
 streamlit
-mandas
+pandas
 PIL
 pickle
 matplotlib
