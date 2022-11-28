@@ -21,20 +21,30 @@ st.set_page_config(
 # Chargement des données #
 ##########################
 # Images
-pouce_vert = Image.open('images/pouce_vert.png')
-pouce_rouge = Image.open("images/pouce_rouge.png")
-logo = Image.open("images/logo.jpg")
-# Données
+@st.cache
+def load_image():
+    pouce_vert = Image.open('images/pouce_vert.png')
+    pouce_rouge = Image.open("images/pouce_rouge.png")
+    logo = Image.open("images/logo.jpg")
+    return pouce_vert, pouce_rouge, logo
 
-data_test = pd.read_parquet("data/small_test.parquet")
-data_test = data_test.set_index("SK_ID_CURR")
-#data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
-data_test = data_test.drop(data_test.columns[[0]], axis=1)
-with open("data/model.pkl", 'rb') as file:
-    model = pickle.load(file)
-col_info = pd.read_csv("data/col_info.csv")
-with open("data/shap_values.pkl", 'rb') as file :
-    shap_values = pickle.load(file)
+pouce_vert, pouce_rouge, logo = load_image()
+
+# Données
+@st.cache
+def load_data():
+    data_test = pd.read_parquet("data/small_test.parquet")
+    data_test = data_test.set_index("SK_ID_CURR")
+    #data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+    data_test = data_test.drop(data_test.columns[[0]], axis=1)
+    with open("data/model.pkl", 'rb') as file:
+        model = pickle.load(file)
+    col_info = pd.read_csv("data/col_info.csv")
+    with open("data/shap_values.pkl", 'rb') as file :
+        shap_values = pickle.load(file)
+    return data_test, model, col_info, shap_values
+
+data_test, model, col_info, shap_values = load_data()
 
 
 
@@ -52,7 +62,15 @@ col1 = st.sidebar
 col1.image(logo)
 
 #st.sidebar.image(logo, width=150)
-
+col1 = st.sidebar
+client_list = data_test.index.to_list()
+col1.header("Sélection du client:")
+selection = col1.selectbox(
+        "Quel client ?",
+        client_list
+    )
+# save variables to use on other pages
+st.session_state["id_client"] = selection
 
 
 # summary plot
