@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(
     page_title="Credit application",
-    page_icon="random",
+    page_icon="moneybag",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
