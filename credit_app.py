@@ -5,6 +5,18 @@ import pickle
 
 import shap
 import matplotlib.pyplot as plt
+
+st.set_page_config(
+    page_title="Credit application",
+    page_icon="random",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'About': "# Application développée par Mikael André"
+    }
+)
+
+
 ##########################
 # Chargement des données #
 ##########################
@@ -51,6 +63,6 @@ def summary_plot(shap_values, data_test):
     return fig
 fig = summary_plot(shap_values, data_test)
 st.pyplot(fig,bbox_inches='tight')
-
+plt.clf()
 
 

@@ -23,10 +23,12 @@ clients["pred_score_1"] = pred_score1
 clients["pred_score_2"] = pred_score2
 clients["prob_1"] = probs[:,1]
 
-
+col1 = st.sidebar
+col1.header('Client sélectionné')
+col1.write("Client ID :",str(id_client))
 
 st.header('Comparaison avec un groupe de client similaires')
-option = st.selectbox(
+option = col1.selectbox(
     "Quelles similarités ?",
     ("Probabilité de remboursement","Valeures influencantes")
 )

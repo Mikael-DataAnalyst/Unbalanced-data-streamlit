@@ -1,0 +1,12 @@
+
+[theme]
+
+base="light"
+
+
+[deprecation]
+
+# Set to false to disable the deprecation warning for using the global pyplot instance.
+# Default: true
+showPyplotGlobalUse = false
+
