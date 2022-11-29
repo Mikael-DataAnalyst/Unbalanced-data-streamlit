@@ -58,18 +58,20 @@ pred_score1 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring1
 pred_score2 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring2
 feats = data_test.columns
 client_list = data_test.index.to_list()
-st.session_state["id_client"] = 100001
-st.session_state["idx"] = client_list.index(100001)
+id_client = 100001
 
-id_client = st.session_state["id_client"]
 
-idx = st.session_state["idx"]
+st.session_state["client_id"] = id_client
+st.session_state["client_idx"] = client_list.index(100001)
+
 idx_nn_prob = dict_nn[str(id_client)][0]
 idx_nn_shap = dict_nn[str(id_client)][1]
-
 st.session_state["idx_nn_prob"]= idx_nn_prob
 st.session_state["idx_nn_shap"]= idx_nn_shap
 
+
+id_client = st.session_state["client_id"]
+idx = st.session_state["client_idx"]
 
 
 col1 = st.sidebar
@@ -84,18 +86,6 @@ def glossaire():
     explication = expander1.multiselect("Quel terme", options = features_list, help="Tapez votre recherche")
     return expander1.table(col_info[col_info["features"].isin(explication)][["features","Description"]])
 
-#st.sidebar.image(logo, width=150)
-col1 = st.sidebar
-client_list = data_test.index.to_list()
-col1.header("Sélection du client:")
-selection = col1.selectbox(
-        "Quel client ?",
-        client_list
-    )
-# save variables to use on other pages
-st.session_state["id_client"] = selection
-st.session_state["idx"] = client_list.index(selection)
-
 # summary plot
 st.header("Données globales")
 st.write("Données qui influençent le plus la décision")
@@ -107,5 +97,17 @@ fig = summary_plot(shap_values, data_test)
 
 st.pyplot(fig,bbox_inches='tight')
 plt.clf()
+col1 = st.sidebar
+client_list = data_test.index.to_list()
+col1.header("Sélection du client:")
+selection = col1.selectbox(
+        "Quel client ?",
+        client_list
+    )
+# save variables to use on other pages
+st.session_state["client_id"] = selection
+st.session_state["client_idx"] = client_list.index(selection)
+
+
 
 

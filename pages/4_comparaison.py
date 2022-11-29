@@ -6,13 +6,15 @@ import json
 import shap
 import matplotlib.pyplot as plt
 import numpy as np
-from credit_app import shap_values, data_test, expected_value, client_list
+from credit_app import shap_values, data_test, expected_value, client_list, dict_nn
 from credit_app import pred_score1, pred_score2, probs, glossaire
 
-id_client = st.session_state["id_client"]
+id_client = st.session_state["client_id"]
 st.write(id_client)
-idx_nn_prob = st.session_state["idx_nn_prob"]
-idx_nn_shap = st.session_state["idx_nn_shap"]
+idx_nn_prob = dict_nn[str(id_client)][0]
+idx_nn_shap = dict_nn[str(id_client)][1]
+st.session_state["idx_nn_prob"]= idx_nn_prob
+st.session_state["idx_nn_shap"]= idx_nn_shap
 
 
 clients= pd.DataFrame(data_test.index)

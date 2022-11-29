@@ -19,11 +19,11 @@ if changement:
             client_list
         )
     # save variables to use on other pages
-    st.session_state["id_client"] = selection
-    st.session_state["idx"] = client_list.index(selection)
+    st.session_state["client_id"] = selection
+    st.session_state["client_idx"] = client_list.index(selection)
 
-id_client = st.session_state["id_client"]
-idx = st.session_state["idx"]
+id_client = st.session_state["client_id"]
+idx = st.session_state["client_idx"]
 col1 = st.sidebar
 col1.header('Client sélectionné')
 col1.write("Client ID :",str(id_client))

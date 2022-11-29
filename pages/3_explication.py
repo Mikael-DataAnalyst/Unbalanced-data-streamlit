@@ -15,8 +15,8 @@ st.write('''
     Les données en rouge l'augmente
     ''')
 
-idx = st.session_state["idx"]
-id_client = st.session_state["id_client"]
+idx = st.session_state["client_idx"]
+id_client = st.session_state["client_id"]
 
 col1 = st.sidebar
 col1.header('Client sélectionné')

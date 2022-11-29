@@ -9,75 +9,71 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
-st.write(st.session_state)
 
-id_client = st.session_state["id_client"]
-st.write("hello")
-idx = st.session_state["idx"]
-st.write("hello")
+id_client = st.session_state["client_id"]
+idx = st.session_state["client_idx"]
 idx_nn_prob = st.session_state["idx_nn_prob"]
 idx_nn_shap = st.session_state["idx_nn_shap"]
-st.write("hello")
 
 df_client = info_client[info_client["SK_ID_CURR"]== id_client].T
-st.write("hello")
+
 col1 = st.sidebar
 col1.header('Client sélectionné')
 col1.write("Client ID :",str(id_client))
 
-def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Adds a UI on top of a dataframe to let viewers filter columns
+# def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Adds a UI on top of a dataframe to let viewers filter columns
 
-    Args:
-        df (pd.DataFrame): Original dataframe
+#     Args:
+#         df (pd.DataFrame): Original dataframe
 
-    Returns:
-        pd.DataFrame: Filtered dataframe
-    """
-    modify = col1.checkbox("Add filters")
+#     Returns:
+#         pd.DataFrame: Filtered dataframe
+#     """
+#     modify = col1.checkbox("Add filters")
 
-    if not modify:
-        return df
+#     if not modify:
+#         return df
 
-    df = df.copy()
+#     df = df.copy()
 
-    modification_container = st.container()
+#     modification_container = st.container()
 
-    with modification_container:
+#     with modification_container:
         
-        unique_client = col1.checkbox("Client actuel")
-        if unique_client:
-            df = df[df["SK_ID_CURR"]==id_client]
+#         unique_client = col1.checkbox("Client actuel")
+#         if unique_client:
+#             df = df[df["SK_ID_CURR"]==id_client]
 
-        group_nn = col1.checkbox("Clients comparables")
-        if group_nn:
-            left, right = st.columns((1, 20))
+#         group_nn = col1.checkbox("Clients comparables")
+#         if group_nn:
+#             left, right = st.columns((1, 20))
             
-            to_add_nn = right.selectbox(
-            "Quel groupe de client ?",
-            ("Probabilité de remboursement","Valeures influencantes")
-        )
-            if to_add_nn == "Probabilité de remboursement" :
-                idx_nn = idx_nn_prob
-            if to_add_nn == "Valeures influencantes" :
-                idx_nn = idx_nn_shap
-            df = info_client.iloc[idx_nn]
+#             to_add_nn = right.selectbox(
+#             "Quel groupe de client ?",
+#             ("Probabilité de remboursement","Valeures influencantes")
+#         )
+#             if to_add_nn == "Probabilité de remboursement" :
+#                 idx_nn = idx_nn_prob
+#             if to_add_nn == "Valeures influencantes" :
+#                 idx_nn = idx_nn_shap
+#             df = info_client.iloc[idx_nn]
 
-        multiple_client = col1.checkbox("Plus de clients")
-        if multiple_client:
-            left, right = st.columns((1, 20))
+#         multiple_client = col1.checkbox("Plus de clients")
+#         if multiple_client:
+#             left, right = st.columns((1, 20))
 
-            to_filter_clients = right.multiselect("Sélection des clients supplémentaires", info_client["SK_ID_CURR"])
+#             to_filter_clients = right.multiselect("Sélection des clients supplémentaires", info_client["SK_ID_CURR"])
 
-            df = df.append(info_client[info_client["SK_ID_CURR"].isin(to_filter_clients)])
+#             df = df.append(info_client[info_client["SK_ID_CURR"].isin(to_filter_clients)])
 
-        column_selection = col1.checkbox("Sélection des données")
-        if column_selection:
-            left, right = st.columns((1, 20))
-            to_select_column = st.multiselect("Quelles données afficher ?", df.columns.drop(["SK_ID_CURR"]))
-            to_select_column =["SK_ID_CURR"] + to_select_column
-            df = df[to_select_column]
+#         column_selection = col1.checkbox("Sélection des données")
+#         if column_selection:
+#             left, right = st.columns((1, 20))
+#             to_select_column = st.multiselect("Quelles données afficher ?", df.columns.drop(["SK_ID_CURR"]))
+#             to_select_column =["SK_ID_CURR"] + to_select_column
+#             df = df[to_select_column]
 
         # filter_column = col1.checkbox("Filtrer les données")
         # if filter_column:
@@ -123,10 +119,11 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         #             if user_text_input:
         #                 df = df[df[column].astype(str).str.contains(user_text_input)]
 
-    return df
+#     return df
 
     
 
 
-st.dataframe(filter_dataframe(info_client))
+# st.dataframe(filter_dataframe(info_client))
+st.dataframe(info_client)
 glossaire()
