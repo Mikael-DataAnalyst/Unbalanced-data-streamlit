@@ -31,7 +31,6 @@ def load_image():
 pouce_vert, pouce_rouge, logo = load_image()
 
 # Données
-@st.cache
 def load_data():
     data_test = pd.read_parquet("data/small_test.parquet")
     data_test = data_test.set_index("SK_ID_CURR")
@@ -85,7 +84,7 @@ st.session_state["idx"] = client_list.index(selection)
 # summary plot
 st.header("Données globales")
 st.write("Données qui influençent le plus la décision")
-@st.cache
+
 def summary_plot(shap_values, data_test):
     fig = shap.summary_plot(shap_values, data_test, show = False, max_display = 15, plot_size = (10,5))
     return fig

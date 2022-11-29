@@ -9,7 +9,7 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
-
+st.write(st.session_state)
 
 id_client = st.session_state["id_client"]
 
