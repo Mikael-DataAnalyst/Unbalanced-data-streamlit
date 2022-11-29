@@ -57,7 +57,8 @@ pred_score1 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring1
 pred_score2 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring2
 feats = data_test.columns
 client_list = data_test.index.to_list()
-
+st.session_state["id_client"] = 100001
+st.session_state["idx"] = client_list.index(100001)
 col1 = st.sidebar
 col1.image(logo)
 
@@ -71,15 +72,17 @@ selection = col1.selectbox(
     )
 # save variables to use on other pages
 st.session_state["id_client"] = selection
-
+st.session_state["idx"] = client_list.index(selection)
 
 # summary plot
 st.header("Données globales")
 st.write("Données qui influençent le plus la décision")
+@st.cache
 def summary_plot(shap_values, data_test):
     fig = shap.summary_plot(shap_values, data_test, show = False, max_display = 15, plot_size = (10,5))
     return fig
 fig = summary_plot(shap_values, data_test)
+
 st.pyplot(fig,bbox_inches='tight')
 plt.clf()
 

@@ -8,15 +8,19 @@ from credit_app import pouce_rouge, pouce_vert, probs
 # Select Box
 ##############
 col1 = st.sidebar
-client_list = data_test.index.to_list()
-col1.header("Sélection du client:")
-selection = col1.selectbox(
-        "Quel client ?",
-        client_list
-    )
-# save variables to use on other pages
-st.session_state["id_client"] = selection
-st.session_state["idx"] = client_list.index(selection)
+
+
+changement = col1.checkbox("Voulez-vous changer de client")
+if changement:    
+    client_list = data_test.index.to_list()
+    col1.header("Sélection du client:")
+    selection = col1.selectbox(
+            "Quel client ?",
+            client_list
+        )
+    # save variables to use on other pages
+    st.session_state["id_client"] = selection
+    st.session_state["idx"] = client_list.index(selection)
 
 id_client = st.session_state["id_client"]
 idx = st.session_state["idx"]
