@@ -70,7 +70,6 @@ st.session_state["idx_nn_prob"]= idx_nn_prob
 st.session_state["idx_nn_shap"]= idx_nn_shap
 
 
-id_client = st.session_state["client_id"]
 idx = st.session_state["client_idx"]
 
 
