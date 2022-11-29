@@ -125,5 +125,5 @@ col1.write("Client ID :",str(id_client))
 
 
 # st.dataframe(filter_dataframe(info_client))
-st.dataframe(info_client)
+st.dataframe(info_client.head(5))
 glossaire()
