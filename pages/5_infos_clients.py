@@ -20,7 +20,7 @@ idx_nn_shap = st.session_state["idx_nn_shap"]
 st.write("hello")
 
 df_client = info_client[info_client["SK_ID_CURR"]== id_client].T
-
+st.write("hello")
 col1 = st.sidebar
 col1.header('Client sélectionné')
 col1.write("Client ID :",str(id_client))

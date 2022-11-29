@@ -10,6 +10,7 @@ from credit_app import shap_values, data_test, expected_value, client_list
 from credit_app import pred_score1, pred_score2, probs, glossaire
 
 id_client = st.session_state["id_client"]
+st.write(id_client)
 idx_nn_prob = st.session_state["idx_nn_prob"]
 idx_nn_shap = st.session_state["idx_nn_shap"]
 
