@@ -34,9 +34,11 @@ option = col1.radio(
 )
 if option == "Le plus de client" :
     col1.write("Vous avez choisi de favoriser le recrutement client")
+    col1.write("Le seuil d'acceptation est de 7.3 %")
     threshold = best_tresh_scoring2
 if option == "Le plus rentable" :
     col1.write("Vous avez choisi la sécurité financière")
+    col1.write("Le seuil d'acceptation est de 3.8 %")
     threshold = best_tresh_scoring1
 
 # Accord ou non du crédit en fonction de l'option

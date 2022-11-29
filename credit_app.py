@@ -42,11 +42,10 @@ def load_data():
     col_info = pd.read_csv("data/col_info.csv")
     with open("data/shap_values.pkl", 'rb') as file :
         shap_values = pickle.load(file)
-    return data_test, model, col_info, shap_values
+    info_client = pd.read_parquet("data/info_client.parquet")
+    return data_test, model, col_info, shap_values, info_client
 
-data_test, model, col_info, shap_values = load_data()
-
-
+data_test, model, col_info, shap_values, info_client = load_data()
 
 # set variables
 expected_value = 0.07576103670792426
@@ -61,6 +60,15 @@ st.session_state["id_client"] = 100001
 st.session_state["idx"] = client_list.index(100001)
 col1 = st.sidebar
 col1.image(logo)
+
+
+# Fonctions
+def glossaire():
+    features_list = col_info["features"]
+
+    expander1 = st.expander("Voir Glossaire")
+    explication = expander1.multiselect("Quel terme", options = features_list, help="Tapez votre recherche")
+    return expander1.table(col_info[col_info["features"].isin(explication)][["features","Description"]])
 
 #st.sidebar.image(logo, width=150)
 col1 = st.sidebar

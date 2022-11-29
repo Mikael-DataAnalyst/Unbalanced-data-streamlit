@@ -7,7 +7,7 @@ import shap
 import matplotlib.pyplot as plt
 import numpy as np
 from credit_app import shap_values, data_test, expected_value, client_list
-from credit_app import pred_score1, pred_score2, probs
+from credit_app import pred_score1, pred_score2, probs, glossaire
 
 with open("data/dict_nn.txt") as file :
     tmp = file.read()
@@ -15,8 +15,11 @@ dict_nn = json.loads(tmp)
 id_client = st.session_state["id_client"]
 
 idx = st.session_state["idx"]
-id_nn_prob = dict_nn[str(id_client)][0]
-id_nn_shap = dict_nn[str(id_client)][1]
+idx_nn_prob = dict_nn[str(id_client)][0]
+idx_nn_shap = dict_nn[str(id_client)][1]
+
+st.session_state["idx_nn_prob"]= idx_nn_prob
+st.session_state["idx_nn_shap"]= idx_nn_shap
 
 clients= pd.DataFrame(data_test.index)
 clients["pred_score_1"] = pred_score1
@@ -33,9 +36,9 @@ option = col1.selectbox(
     ("Probabilité de remboursement","Valeures influencantes")
 )
 if option == "Probabilité de remboursement" :
-    id_nn = id_nn_prob
+    id_nn = idx_nn_prob
 if option == "Valeures influencantes" :
-    id_nn = id_nn_shap
+    id_nn = idx_nn_shap
 
 
 
@@ -108,4 +111,4 @@ def get_idx(id):
 
 st_shap2([get_idx(id_1),get_idx(id_2),get_idx(id_1)], n_features=5)
 
-
+glossaire()
