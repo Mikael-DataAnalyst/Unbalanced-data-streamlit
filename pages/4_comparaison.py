@@ -6,8 +6,12 @@ import json
 import shap
 import matplotlib.pyplot as plt
 import numpy as np
-from credit_app import shap_values, data_test, expected_value, client_list, dict_nn
+from credit_app import shap_values, data_test, expected_value, client_list
 from credit_app import pred_score1, pred_score2, probs, glossaire
+
+with open("data/dict_nn.txt") as file :
+        tmp = file.read()
+dict_nn = json.loads(tmp)
 
 id_client = st.session_state["client_id"]
 st.write(id_client)
