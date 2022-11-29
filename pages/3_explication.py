@@ -42,7 +42,6 @@ neg_indexes = shap_user_importance[:top_user_n].tolist()
 pos_indexes = shap_user_importance[-top_user_n:].tolist()
 main_feat_user = neg_indexes + pos_indexes
 main_feat_name = data_test.columns[main_feat_user]
-st.write(main_feat_name)
 fig = shap.force_plot(expected_value, shap_values[idx,main_feat_user],
                     data_test.iloc[idx,main_feat_user].round(2),
                     matplotlib=True,show=False,
