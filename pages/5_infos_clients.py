@@ -12,10 +12,12 @@ from pandas.api.types import (
 st.write(st.session_state)
 
 id_client = st.session_state["id_client"]
-
+st.write("hello")
 idx = st.session_state["idx"]
+st.write("hello")
 idx_nn_prob = st.session_state["idx_nn_prob"]
 idx_nn_shap = st.session_state["idx_nn_shap"]
+st.write("hello")
 
 df_client = info_client[info_client["SK_ID_CURR"]== id_client].T
 

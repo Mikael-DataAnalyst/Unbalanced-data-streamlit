@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 import pickle
-
+import json
 import shap
 import matplotlib.pyplot as plt
 
@@ -42,9 +42,12 @@ def load_data():
     with open("data/shap_values.pkl", 'rb') as file :
         shap_values = pickle.load(file)
     info_client = pd.read_parquet("data/info_client.parquet")
-    return data_test, model, col_info, shap_values, info_client
+    with open("data/dict_nn.txt") as file :
+        tmp = file.read()
+    dict_nn = json.loads(tmp)
+    return data_test, model, col_info, shap_values, info_client, dict_nn
 
-data_test, model, col_info, shap_values, info_client = load_data()
+data_test, model, col_info, shap_values, info_client, dict_nn = load_data()
 
 # set variables
 expected_value = 0.07576103670792426
@@ -57,6 +60,18 @@ feats = data_test.columns
 client_list = data_test.index.to_list()
 st.session_state["id_client"] = 100001
 st.session_state["idx"] = client_list.index(100001)
+
+id_client = st.session_state["id_client"]
+
+idx = st.session_state["idx"]
+idx_nn_prob = dict_nn[str(id_client)][0]
+idx_nn_shap = dict_nn[str(id_client)][1]
+
+st.session_state["idx_nn_prob"]= idx_nn_prob
+st.session_state["idx_nn_shap"]= idx_nn_shap
+
+
+
 col1 = st.sidebar
 col1.image(logo)
 
