@@ -108,9 +108,42 @@ def glossaire():
     explication = expander1.multiselect("Quel terme", options = features_list, help="Tapez votre recherche")
     return expander1.table(col_info[col_info["features"].isin(explication)][["features","Description"]])
 
+st.write("# Bienvenue sur l'application pour les crédits ")
+st.markdown(
+    """ 
+    Cette application vous permet de voir la décision d'octroi de crédit
+     pour un client, de pouvoir lui expliquer cette décision 
+     et de consulter ses informations descriptives.
+    
+    ### Quels clients ?
+    La base de donnée est composée d'environ 50 000 clients en attente d'une décision.
+
+    Plusieurs options vous seront proposées dans cette barre sur les différentes pages.
+    ### Comment est basée la décision ?
+    - Un algorythme prédit la probabilité de non remboursement du client
+    - Vous pouvez choisir entre 2 choix :
+        - 💰 Le plus rentable : le seuil acceptable est fixé à 3.8 %
+            Nous nous assurons d'avoir le plus de client fiables mais refusont beaucoup de clients
+        - 👫 Recrutement Client : le seuil acceptable est fixé à 7.3%
+            Nous recrutons le maximum de clients tout en étant rentable
+
+    #### Sommaire
+    👈 Vous pouvez naviguer en sélectionnant les pages dans la barre de droite.
+    - Statut du crédit :
+        - Probabilité
+        - Décision en fonction de la politique choisie
+    - Explications :
+        - Comments ses données influences sa probabilités
+    - Comparaison :
+        - Comparaison avec des clients similaires
+    - Informations personnelles
+        - Consultation des données brutes avant transformation
+     """
+)
+
 # summary plot
-st.header("Données globales")
-st.write("Données qui influençent le plus la décision")
+
+
 
 # def summary_plot(shap_values, data_test):
 #     shap.summary_plot(shap_values, data_test, show = False, max_display = 15, plot_size = (10,5))

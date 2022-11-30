@@ -5,8 +5,11 @@ import shap
 import numpy as np
 import matplotlib.pyplot as plt
 
-from credit_app import glossaire, shap_values, expected_value, data_test
+from Home import glossaire, shap_values, expected_value, data_test
 
+st.set_page_config(
+    page_title="Explication de la décision",
+    page_icon="❔",layout="wide")
 
 st.write('''
     # Pourquoi le crédit a été refusé ou accepté

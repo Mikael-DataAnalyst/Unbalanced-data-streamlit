@@ -6,8 +6,12 @@ import json
 import shap
 import matplotlib.pyplot as plt
 import numpy as np
-from credit_app import shap_values, data_test, expected_value, client_list
-from credit_app import pred_score1, pred_score2, probs, glossaire
+from Home import shap_values, data_test, expected_value, client_list
+from Home import pred_score1, pred_score2, probs, glossaire
+
+st.set_page_config(
+    page_title="Explication de la décision",
+    page_icon="📊",layout="wide")
 
 with open("data/dict_nn.txt") as file :
         tmp = file.read()

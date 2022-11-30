@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from credit_app import glossaire, info_client, client_list
+from Home import glossaire, info_client, client_list
 
 from pandas.api.types import (
     is_categorical_dtype,
@@ -9,6 +9,9 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
+st.set_page_config(
+    page_title="Explication de la décision",
+    page_icon="📄",layout="wide")
 
 id_client = st.session_state["new_client"]
 idx = st.session_state["client_idx"]
