@@ -21,7 +21,7 @@ st.set_page_config(
 # Chargement des données #
 ##########################
 # Images
-@st.cache
+@st.experimental_singleton
 def load_image():
     pouce_vert = Image.open('images/pouce_vert.png')
     pouce_rouge = Image.open("images/pouce_rouge.png")
@@ -59,22 +59,44 @@ pred_score1 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring1
 pred_score2 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring2
 feats = data_test.columns
 client_list = data_test.index.to_list()
-id_client = 100001
+client_list = data_test.index.to_list()
+
+col1 = st.sidebar
 
 
-st.session_state["client_id"] = id_client
-st.session_state["client_idx"] = client_list.index(100001)
+col1.header("Sélection du client:")
 
-idx_nn_prob = dict_nn[str(id_client)][0]
-idx_nn_shap = dict_nn[str(id_client)][1]
-st.session_state["idx_nn_prob"]= idx_nn_prob
-st.session_state["idx_nn_shap"]= idx_nn_shap
+selection = col1.selectbox(
+        "Quel client ?",
+        client_list, key="client_id",)
+
+check_key = st.session_state.get("new_client", "empty")
+
+
+@st.experimental_singleton
+def selection_client(selection):
+    st.session_state["new_client"] = selection
+    st.session_state["client_idx"] =client_list.index(selection)
+    idx_nn_prob = dict_nn[str(st.session_state["new_client"])][0]
+    idx_nn_shap = dict_nn[str(st.session_state["new_client"])][1]
+    st.session_state["idx_nn_prob"]= idx_nn_prob
+    st.session_state["idx_nn_shap"]= idx_nn_shap    
+
+selection_client(selection)
+if check_key == "empty":
+    col1.header('Client sélectionné')
+    col1.write('Client ID : 100001')
+else:
+    col1.header('Client sélectionné')
+    col1.write("Client ID :",str(st.session_state.new_client))
+# save variables to use on other pages
+
+
 
 
 idx = st.session_state["client_idx"]
 
 
-col1 = st.sidebar
 col1.image(logo)
 
 
@@ -97,16 +119,8 @@ st.write("Données qui influençent le plus la décision")
 
 st.pyplot(bbox_inches='tight')
 plt.clf()
-col1 = st.sidebar
-client_list = data_test.index.to_list()
-col1.header("Sélection du client:")
-selection = col1.selectbox(
-        "Quel client ?",
-        client_list
-    )
-# save variables to use on other pages
-st.session_state["client_id"] = selection
-st.session_state["client_idx"] = client_list.index(selection)
+
+
 
 
 

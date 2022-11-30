@@ -13,7 +13,7 @@ with open("data/dict_nn.txt") as file :
         tmp = file.read()
 dict_nn = json.loads(tmp)
 
-id_client = st.session_state["client_id"]
+id_client = st.session_state["new_client"]
 st.write(id_client)
 idx_nn_prob = dict_nn[str(id_client)][0]
 idx_nn_shap = dict_nn[str(id_client)][1]

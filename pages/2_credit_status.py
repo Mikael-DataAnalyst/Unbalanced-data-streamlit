@@ -2,13 +2,14 @@ import streamlit as st
 import numpy as np
 
 from credit_app import best_tresh_scoring1, best_tresh_scoring2, feats, model, data_test
-from credit_app import pouce_rouge, pouce_vert, probs
+from credit_app import pouce_rouge, pouce_vert, probs, selection_client
+id_client = st.session_state["new_client"]
 
 ##############
 # Select Box
 ##############
-col1 = st.sidebar
 
+col1 = st.sidebar
 
 changement = col1.checkbox("Voulez-vous changer de client")
 if changement:    
@@ -19,12 +20,9 @@ if changement:
             client_list
         )
     # save variables to use on other pages
-    st.session_state["client_id"] = selection
-    st.session_state["client_idx"] = client_list.index(selection)
+    selection_client(selection)
 
-id_client = st.session_state["client_id"]
 idx = st.session_state["client_idx"]
-col1 = st.sidebar
 col1.header('Client sélectionné')
 col1.write("Client ID :",str(id_client))
 

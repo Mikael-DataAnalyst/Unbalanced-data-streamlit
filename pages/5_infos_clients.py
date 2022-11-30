@@ -10,7 +10,7 @@ from pandas.api.types import (
     is_object_dtype,
 )
 
-id_client = st.session_state["client_id"]
+id_client = st.session_state["new_client"]
 idx = st.session_state["client_idx"]
 idx_nn_prob = st.session_state["idx_nn_prob"]
 idx_nn_shap = st.session_state["idx_nn_shap"]
