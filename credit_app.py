@@ -31,6 +31,7 @@ def load_image():
 pouce_vert, pouce_rouge, logo = load_image()
 
 # Données
+@st.experimental_memo
 def load_data():
     data_test = pd.read_parquet("data/small_test.parquet")
     data_test = data_test.set_index("SK_ID_CURR")
@@ -89,12 +90,12 @@ def glossaire():
 st.header("Données globales")
 st.write("Données qui influençent le plus la décision")
 
-def summary_plot(shap_values, data_test):
-    fig = shap.summary_plot(shap_values, data_test, show = False, max_display = 15, plot_size = (10,5))
-    return fig
-fig = summary_plot(shap_values, data_test)
+# def summary_plot(shap_values, data_test):
+#     shap.summary_plot(shap_values, data_test, show = False, max_display = 15, plot_size = (10,5))
+    
+# summary_plot(shap_values, data_test)
 
-st.pyplot(fig,bbox_inches='tight')
+st.pyplot(bbox_inches='tight')
 plt.clf()
 col1 = st.sidebar
 client_list = data_test.index.to_list()

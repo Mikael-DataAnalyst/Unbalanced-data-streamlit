@@ -66,7 +66,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
             to_filter_clients = right.multiselect("Sélection des clients supplémentaires", info_client["SK_ID_CURR"])
 
-            df = df.append(info_client[info_client["SK_ID_CURR"].isin(to_filter_clients)])
+            df = pd.concat([df,info_client[info_client["SK_ID_CURR"].isin(to_filter_clients)]])
 
         column_selection = col1.checkbox("Sélection des données")
         if column_selection:
