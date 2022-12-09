@@ -18,7 +18,6 @@ with open("data_saved/dict_nn1.txt") as file :
 dict_nn = json.loads(tmp)
 
 id_client = st.session_state["new_client"]
-st.write(id_client)
 idx_nn_prob = dict_nn[str(id_client)][0]
 idx_nn_shap = dict_nn[str(id_client)][1]
 st.session_state["idx_nn_prob"]= idx_nn_prob
