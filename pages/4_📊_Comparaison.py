@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="Explication de la décision",
     page_icon="📊",layout="wide")
 
-with open("data/dict_nn.txt") as file :
+with open("data_saved/dict_nn1.txt") as file :
         tmp = file.read()
 dict_nn = json.loads(tmp)
 

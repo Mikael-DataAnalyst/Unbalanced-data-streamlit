@@ -33,17 +33,17 @@ pouce_vert, pouce_rouge, logo = load_image()
 # Données
 @st.experimental_memo
 def load_data():
-    data_test = pd.read_parquet("data/small_test.parquet")
+    data_test = pd.read_parquet("data_saved/small_test1.parquet")
     data_test = data_test.set_index("SK_ID_CURR")
     #data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
     data_test = data_test.drop(data_test.columns[[0]], axis=1)
     with open("data/model.pkl", 'rb') as file:
         model = pickle.load(file)
-    col_info = pd.read_csv("data/col_info.csv")
+    col_info = pd.read_csv("data_saved/col_info.csv")
     with open("data/shap_values.pkl", 'rb') as file :
         shap_values = pickle.load(file)
-    info_client = pd.read_parquet("data/info_client.parquet")
-    with open("data/dict_nn.txt") as file :
+    info_client = pd.read_parquet("data_saved/info_client.parquet")
+    with open("data_saved/dict_nn.txt") as file :
         tmp = file.read()
     dict_nn = json.loads(tmp)
     return data_test, model, col_info, shap_values, info_client, dict_nn
