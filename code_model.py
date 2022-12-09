@@ -396,11 +396,17 @@ def lgmb_model(train_df,test_df):
     submit['TARGET'] = test_predictions
     submit.to_csv(submission_file_name, index = False)
 
-    
+def get_info_client():
+    application = pd.read_csv(path+'application_train.csv')
+    bureau = pd.read_csv(path+"bureau.csv")
+    info_client = application.join(bureau, how ="left", on="SK_ID_CURR", rsuffix="BURO")
+    info_client.to_parquet("saved_data/info_client.parquet")
 
 
 def main(debug = False):
     num_rows = 20000 if debug else None
+    with timer("Infos clients"):
+        get_info_client()
     df = application_train_test(num_rows)
     print("df shape:",df.shape, "Nan:",df.isna().sum().sum())
     with timer("Process bureau and bureau_balance"):

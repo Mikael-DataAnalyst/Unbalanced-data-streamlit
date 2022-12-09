@@ -12,7 +12,13 @@ st.set_page_config(
     page_icon="❔",layout="wide")
 
 st.write('''
-    # Pourquoi le crédit a été refusé ou accepté
+    # Les données les plus influençante du modèle :''')
+col1, col2 = st.columns([2,1])
+col1.image("images/summary_plot.png")
+col2.image("images/features.png",width=500)
+
+st.write('''
+    # Pourquoi le crédit a été refusé ou accepté pour le client sélectionné
     Les données en bleu baisse le risque de non remboursement
 
     Les données en rouge l'augmente

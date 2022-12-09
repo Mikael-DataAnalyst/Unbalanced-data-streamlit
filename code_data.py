@@ -134,20 +134,36 @@ def get_dict_nn(data_test,new_train,model, shap_values):
     with open('saved_data/dict_nn1.txt', 'w') as convert_file:
         convert_file.write(json.dumps(dict_nn))
 
-def column_info(new_train):
-    columns_df = new_train.columns.tolist()
+def rename_function(x):
+    if x["Table"]=="installments":
+        return "INST_" + x["Row"]
+    if x["Table"]=="bureau.csv":
+        return "BURO_" + x["Row"]
+    if x["Table"]=="bureau":
+        return "BURO_" + x["Row"]
+    if x["Table"]=="previous":
+        return "PREV_" + x["Row"]
+    if x["Table"]=="POS":
+        return "POS_" + x["Row"]
+    if x["Table"]=="credit":
+        return "CC_" + x["Row"]
+    if x["Table"] == "application":
+        return x["Row"] 
+
+def column_info():
     col_info = pd.read_csv("/Users/mikae/OneDrive/Documents/Formation/Data Scientist/Projet_7/data/HomeCredit_columns_description.csv",encoding = "ISO-8859-1")
-    col_info = col_info[col_info["Table"]=="application_{train|test}.csv"]
-    col_info = col_info[col_info["Row"].isin(columns_df)]
-    col_info = col_info[["Row","Description"]]
-    col_info = col_info.set_index("Row")
+    col_info = col_info[["Table","Row", "Description"]]
+    col_info["Table"] = col_info["Table"].map(lambda x : x.split("_")[0])
+    col_info["features"] = col_info[["Table","Row"]].apply(lambda x : rename_function(x), axis=1)
+
     col_info.to_csv("saved_data/col_info.csv")
 
 def main():
     model = load_model()
     new_train, data_test = load_df()
     data, y, feats = get_data_train(new_train)
-    annuity_mean, loan_mean = get_scoring(new_train)
+    column_info()
+    #annuity_mean, loan_mean = get_scoring(new_train)
     with timer("Shap values"):
         shap_values = get_shap_values(model, data_test, data,y)
     with timer("Dictionnary for nearest neighboors"):
