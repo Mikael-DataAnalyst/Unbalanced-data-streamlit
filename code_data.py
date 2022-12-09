@@ -168,7 +168,7 @@ def main():
         shap_values = get_shap_values(model, data_test, data,y)
     with timer("Dictionnary for nearest neighboors"):
         get_dict_nn(data_test, new_train,model, shap_values)
-    column_info(new_train)
+    
 
 if __name__ == "__main__":
     with timer("Full model run"):
