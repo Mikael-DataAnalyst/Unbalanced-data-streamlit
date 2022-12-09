@@ -3,47 +3,28 @@ import os
 import pandas as pd
 import gc
 import time
-from nltk.tokenize import RegexpTokenizer
 import numpy as np
 
 
 # utilities
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, KFold, StratifiedKFold
-
-from sklearn.metrics import roc_auc_score, accuracy_score, confusion_matrix, ConfusionMatrixDisplay,precision_recall_curve
+from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.impute import SimpleImputer
 import re
 import pickle
-from imblearn.over_sampling import SMOTE
-from sklearn.preprocessing import StandardScaler
-from imblearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
 
 # modeling 
-from sklearn.linear_model import LogisticRegression
-import xgboost as xgb
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
 import lightgbm as lgb
 
 from contextlib import contextmanager
-from lightgbm import LGBMClassifier
-from sklearn.metrics import roc_auc_score, roc_curve
-
-import shap
-
 import matplotlib.pyplot as plt
-import seaborn as sns
-
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-pd.options.display.max_columns = None
 
 # Path for the files
+# Files come from Kaggle : https://www.kaggle.com/competitions/home-credit-default-risk/data
 path = "/Users/mikae/OneDrive/Documents/Formation/Data Scientist/Projet_7/data/"
 
 
@@ -322,16 +303,6 @@ def train_test_separate(df):
   
     return train_df, test_df
 
-def column_info(train_df):
-    columns_df = train_df.columns.tolist()
-    col_info = pd.read_csv("HomeCredit_columns_description.csv",encoding = "ISO-8859-1")
-    col_info = col_info[col_info["Table"]=="application_{train|test}.csv"]
-    col_info = col_info[col_info["Row"].isin(columns_df)]
-    col_info = col_info[["Row","Description"]]
-    col_info = col_info.set_index("Row")
-    col_info.to_csv("col_info.csv")
-
-
 def get_data(train_df):
     train = train_df.set_index(['SK_ID_CURR'])
     train = train.drop(train_df.columns[0], axis=1)
@@ -381,6 +352,8 @@ def drop_feat(train_df,test_df, threshold=0.9):
     print(len(features_to_drop))
     train_df = train_df.drop(columns = features_to_drop)
     test_df = test_df.drop(columns = features_to_drop)
+    train_df.to_parquet("saved_data/small_train1.parquet")
+    test_df.to_parquet("saved_data/small_test1.parquet")
     return train_df, test_df
 
 def lgmb_model(train_df,test_df):
@@ -407,7 +380,7 @@ def lgmb_model(train_df,test_df):
     clf.fit(train_x, train_y,**fit_params)
 
     # Save model
-    pkl_filename = "model1.pkl"
+    pkl_filename = "saved_data/model1.pkl"
     with open(pkl_filename, 'wb') as file :
         pickle.dump(clf, file)
 
@@ -484,8 +457,6 @@ def main(debug = False):
         gc.collect()
     print("After separate, train_df shape : ", train_df.shape)
     print("After separate, test_df shape : ", test_df.shape)
-    with timer("Info of columns"):
-        column_info(train_df)
     with timer("Select only the most important features"):
         train_df, test_df = drop_feat(train_df, test_df)
     print("After drop, train_df shape : ", train_df.shape)
@@ -494,7 +465,7 @@ def main(debug = False):
         lgmb_model(train_df,test_df)
 
 if __name__ == "__main__":
-    submission_file_name = "submission_02.csv"
+    submission_file_name = "saved_data/submission_02.csv"
     with timer("Full model run"):
         main()
 
