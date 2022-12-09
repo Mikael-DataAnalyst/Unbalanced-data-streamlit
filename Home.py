@@ -32,7 +32,7 @@ pouce_vert, pouce_rouge, logo = load_image()
 # Données
 @st.experimental_memo
 def load_data():
-    data_test = pd.read_parquet("saved_data\small_test1.parquet")
+    data_test = pd.read_parquet("saved_data/small_test1.parquet")
     data_test = data_test.set_index("SK_ID_CURR")
     #data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
     data_test = data_test.drop(data_test.columns[[0,1]], axis=1)
