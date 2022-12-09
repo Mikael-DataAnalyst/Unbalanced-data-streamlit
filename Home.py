@@ -49,7 +49,6 @@ def load_data():
 
 data_test, model, col_info, shap_values, info_client, dict_nn = load_data()
 
-st.write(data_test.columns)
 # set variables
 expected_value = 0.07576103670792426
 best_tresh_scoring1 = 0.03807862092076406 

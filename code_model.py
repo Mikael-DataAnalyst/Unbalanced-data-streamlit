@@ -397,7 +397,7 @@ def lgmb_model(train_df,test_df):
     submit.to_csv(submission_file_name, index = False)
 
 def get_info_client():
-    application = pd.read_csv(path+'application_train.csv')
+    application = pd.read_csv(path+'application_test.csv')
     bureau = pd.read_csv(path+"bureau.csv")
     info_client = application.join(bureau, how ="left", on="SK_ID_CURR", rsuffix="BURO")
     info_client.to_parquet("saved_data/info_client.parquet")
