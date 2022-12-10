@@ -105,7 +105,8 @@ def get_shap_values(model, data_test, data ,y):
     pkl_filename = "saved_data/shap_values1.pkl"
     with open(pkl_filename, 'wb') as file :
         pickle.dump(shap_values, file)
-    return shap_values
+    expected_value = explainer.expected_value
+    return shap_values, expected_value
 
 
 def get_dict_nn(data_test,new_train,model, shap_values):
@@ -133,6 +134,7 @@ def get_dict_nn(data_test,new_train,model, shap_values):
         dict_nn[client]= [nn_prob_list[idx],nn_shap_values_list[idx]]
     with open('saved_data/dict_nn1.txt', 'w') as convert_file:
         convert_file.write(json.dumps(dict_nn))
+    return best_tresh_scoring1, best_tresh_scoring2
 
 def rename_function(x):
     if x["Table"]=="installments":
@@ -165,10 +167,14 @@ def main():
     column_info()
     #annuity_mean, loan_mean = get_scoring(new_train)
     with timer("Shap values"):
-        shap_values = get_shap_values(model, data_test, data,y)
+        shap_values, expected_value = get_shap_values(model, data_test, data,y)
     with timer("Dictionnary for nearest neighboors"):
-        get_dict_nn(data_test, new_train,model, shap_values)
-    
+        best_tresh_scoring1, best_tresh_scoring2 = get_dict_nn(data_test, new_train,model, shap_values)
+    dict_variables = {"expected_value":expected_value,
+                    "best_tresh_scoring_1":best_tresh_scoring1,
+                    "best_tresh_scoring_2":best_tresh_scoring2}
+    with open('saved_data/dict_variables.txt', 'w') as convert_file:
+            convert_file.write(json.dumps(dict_variables))   
 
 if __name__ == "__main__":
     with timer("Full model run"):

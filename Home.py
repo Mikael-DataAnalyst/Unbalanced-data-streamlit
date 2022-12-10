@@ -45,14 +45,16 @@ def load_data():
     with open("saved_data/dict_nn1.txt") as file :
         tmp = file.read()
     dict_nn = json.loads(tmp)
-    return data_test, model, col_info, shap_values, info_client, dict_nn
+    with open("saved_data/dict_variables.txt") as file :
+        tmp = file.read()
+    dict_variables = json.loads(tmp)
+    return data_test, model, col_info, shap_values, info_client, dict_nn,dict_variables
 
-data_test, model, col_info, shap_values, info_client, dict_nn = load_data()
-
+data_test, model, col_info, shap_values, info_client, dict_nn,dict_variables = load_data()
 # set variables
-expected_value = 0.07576103670792426
-best_tresh_scoring1 = 0.03807862092076406 
-best_tresh_scoring2 = 0.07268097663014822
+expected_value = dict_variables["expected_value"]
+best_tresh_scoring1 = dict_variables["best_tresh_scoring_1"]
+best_tresh_scoring2 = dict_variables["best_tresh_scoring_2"]
 probs = model.predict_proba(data_test)
 pred_score1 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring1
 pred_score2 = model.predict_proba(data_test)[:,1] >= best_tresh_scoring2
@@ -72,7 +74,6 @@ selection = col1.selectbox(
 check_key = st.session_state.get("new_client", "empty")
 
 
-@st.experimental_singleton
 def selection_client(selection):
     st.session_state["new_client"] = selection
     st.session_state["client_idx"] =client_list.index(selection)
