@@ -19,4 +19,4 @@ code_data.py permet de générer les données pour l'API :
     - dictionnaire de nearest neighboors
 
 ### L'application est disponible sur Streamlit Cloud :
-https://mikael-dataanalyst-pret-a-depenser-home-full-code-ehmy1l.streamlit.app/
+https://mikael-dataanalyst-pret-a-depenser-home-7jlehp.streamlit.app/
