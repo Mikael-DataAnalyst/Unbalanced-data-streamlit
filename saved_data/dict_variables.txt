@@ -1,1 +1,1 @@
-{"expected_value": 0.07840851075974764, "best_tresh_scoring_1": 0.04147580329279394, "best_tresh_scoring_2": 0.07704189799662743}
+{"expected_value": 0.3270896476638333, "best_tresh_scoring_1": 0.25117330545533556, "best_tresh_scoring_2": 0.41580361247800485}

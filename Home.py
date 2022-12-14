@@ -36,7 +36,7 @@ def load_data():
     data_test = data_test.set_index("SK_ID_CURR")
     #data_test = data_test.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
     data_test = data_test.drop(data_test.columns[[0,1]], axis=1)
-    with open("saved_data/model1.pkl", 'rb') as file:
+    with open("saved_data/model.pkl", 'rb') as file:
         model = pickle.load(file)
     col_info = pd.read_csv("saved_data/col_info.csv")
     with open("saved_data/shap_values1.pkl", 'rb') as file :

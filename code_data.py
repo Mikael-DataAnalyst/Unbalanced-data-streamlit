@@ -42,6 +42,10 @@ def get_data_train(new_train):
     feats = data.columns
     return data, y, feats
 
+#################
+# Business cost #
+#################
+
 # Values to calculate the business cost
 def get_scoring(new_train):
     """Find the cost of a loan and the annuity of a loan"""
@@ -49,8 +53,7 @@ def get_scoring(new_train):
     loan_mean = new_train["AMT_CREDIT"].mean()
     return annuity_mean, loan_mean
 
-
-
+# Several score and information on the test pred versus reality
 def results(y, y_pred,new_train):
     print('Accuracy score for Testing Dataset = ', accuracy_score(y,y_pred))
     print('Roc auc score for Testing Dataset = ', roc_auc_score(y, y_pred))
@@ -74,6 +77,7 @@ def results(y, y_pred,new_train):
     print("Loose for credit refused :", round(loose,0))
     print("save_money for credit refused : ", round(save_money,0))
 
+# Fix threshold for according loan
 def get_threshold(data,y,model,new_train):
     ''' Find the best threshold for 2 scoring :
         - the most profitable (scoring1)
@@ -91,7 +95,6 @@ def get_threshold(data,y,model,new_train):
     cf = confusion_matrix(valid_y, y_pred)
     ConfusionMatrixDisplay(cf).plot()
     
-
     probs_1d = probs[:,1]
     fpr, tpr, thresholds = roc_curve(valid_y, probs_1d)
     gmeans = np.sqrt(tpr * (1-fpr))
@@ -115,7 +118,9 @@ def get_threshold(data,y,model,new_train):
     best_tresh_scoring2 = thresholds[ix]
     return best_tresh_scoring1, best_tresh_scoring2
 
-
+#####################
+# Variables for API #
+#####################
 def get_shap_values(model, data_test, data ,y):
     #Extract the shap values and expected value of the model with a Tree explainer
     train_x, valid_x, train_y, valid_y = train_test_split(data, y, test_size=0.2, shuffle=True, stratify=y, random_state=1301)
@@ -189,6 +194,9 @@ def column_info():
 
     col_info.to_csv("saved_data/col_info.csv")
 
+############
+# Full run #
+############
 def main():
     model = load_model()
     new_train, data_test = load_df()

@@ -31,7 +31,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # Files come from Kaggle : https://www.kaggle.com/competitions/home-credit-default-risk/data
 path = "/Users/mikae/OneDrive/Documents/Formation/Data Scientist/Projet_7/data/"
 
-
+#################
+# Preprocessing #
+#################
 @contextmanager
 def timer(title):
     t0 = time.time()
@@ -298,6 +300,10 @@ def drop_corr(df, threshold = 0.9):
     df = df.drop(columns = to_drop)
     return df
 
+################
+# Prepare data #
+################
+
 # Separate train and test 
 def train_test_separate(df):
     train_df = df[df['TARGET'].notnull()]
@@ -315,6 +321,10 @@ def get_data(train_df):
     y = train["TARGET"]
     return data, y
 
+################
+# Balance data #
+################
+
 def get_pipeline_smote(over_s = 0.1, under_s = 0.8, k =5):
     ''' Pipeline with over sampling with SMOTE
         Undersampling with RandomUnderSampler
@@ -330,6 +340,10 @@ def get_pipeline_smote(over_s = 0.1, under_s = 0.8, k =5):
     pipeline_smote = Pipeline(steps=steps)
     pipeline = pipeline_smote
     return pipeline
+
+######################
+# Features selection #
+######################
 
 # Select only important features
 def drop_feat(train_df,test_df, threshold=0.9):
@@ -378,6 +392,12 @@ def drop_feat(train_df,test_df, threshold=0.9):
     test_df.to_parquet("saved_data/small_test1.parquet")
     return train_df, test_df
 
+##################
+# Training model #
+##################
+
+# Hyperparameters find with Randomizedsearch
+
 def lgmb_model(train_df,test_df):
     data, y = get_data(train_df)
     #Create train and validation set
@@ -386,36 +406,29 @@ def lgmb_model(train_df,test_df):
     callbacks = [lgb.early_stopping(stopping_rounds = 100),
             #lgb.log_evaluation()
             ]
-    fit_params={"lgbm__eval_metric" : 'logloss', 
-                "lgbm__eval_set" : [(valid_x,valid_y)],
-                'lgbm__eval_names': ['valid'],
-                'lgbm__callbacks' : callbacks,
-                }
-
+    fit_params={"eval_metric" : 'logloss', 
+            "eval_set" : [(valid_x,valid_y)],
+            'eval_names': ['valid'],
+            'callbacks' : callbacks,
+            }
     clf = lgb.LGBMClassifier(colsample_bytree=0.8754028264142053, max_depth=3,
                min_child_samples=499, min_child_weight=10.0,
                num_leaves=20, reg_alpha=1, reg_lambda=1,
                scale_pos_weight=1, subsample=0.8860978450206372,
                metric='logloss', n_estimators=5000, n_jobs=4,
                objective='binary', random_state=314)
-    over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
-    under = RandomUnderSampler(sampling_strategy = 0.8, random_state=12)
-    pipeline = Pipeline([('over', over),
-                        ('under', under), 
-                        ('lgbm', clf)])
+
     
-    #Create train and validation set
-    over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
+    '''over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
     under = RandomUnderSampler(sampling_strategy = 0.8, random_state=12)
     pipeline = Pipeline([('over', over),
                     ('under', under), 
                     ])
-    train_x_sm, train_y_sm = pipeline.fit_resample(train_x, train_y)
-    fit_params={"eval_metric" : 'logloss', 
-            "eval_set" : [(valid_x,valid_y)],
-            'eval_names': ['valid'],
-            'callbacks' : callbacks,
-            }
+    train_x_sm, train_y_sm = pipeline.fit_resample(train_x, train_y)'''
+    # reduce balance train
+    pipeline_smote = get_pipeline_smote()
+    train_x_sm , train_y_sm = pipeline_smote.fit_resample(train_x, train_y)
+    #fit the model with train smote
     final_model = clf.fit(train_x_sm, train_y_sm,**fit_params)
 
     # Save model
@@ -423,18 +436,23 @@ def lgmb_model(train_df,test_df):
     with open(pkl_filename, 'wb') as file :
         pickle.dump(final_model, file)
 
+    # Prepare data for prediction
     test = test_df.set_index(['SK_ID_CURR'])
     test = test.drop(train_df.columns[0], axis=1)
     data_test = test.drop(["TARGET"], axis = 1)
     data_test = data_test.replace([np.inf, -np.inf], 0)
     # Empty array for test predictions
     test_predictions = np.zeros(data_test.shape[0])
-    test_predictions += final_model.predict_proba(data_test)[:,1]
-    #test_predictions += final_model.predict_proba(data_test, num_iteration=final_model.best_iteration_)[:,1]
+    #test_predictions += final_model.predict_proba(data_test)[:,1]
+    test_predictions += final_model.predict_proba(data_test, num_iteration=final_model.best_iteration_)[:,1]
     submit = data_test.reset_index()[['SK_ID_CURR']]
     submit['TARGET'] = test_predictions
     submit.to_csv(submission_file_name, index = False)
 
+
+###########################
+# Additional data for API #
+###########################
 def get_info_client():
     ''' get the information of customer before pre-processing'''
 
@@ -445,6 +463,10 @@ def get_info_client():
     info_client.to_parquet("saved_data/info_client.parquet")
 
 
+
+############
+# Full run #
+############
 def main(debug = False):
     num_rows = 20000 if debug else None
     with timer("Infos clients"):
