@@ -122,9 +122,9 @@ st.markdown(
     ### Comment est basée la décision ?
     - Un algorythme prédit la probabilité de non remboursement du client
     - Vous pouvez choisir entre 2 choix :
-        - 💰 Le plus rentable : le seuil acceptable est fixé à 3.8 %
+        - 💰 Le plus rentable : le seuil acceptable est fixé à 25.12 %
             Nous nous assurons d'avoir le plus de client fiables mais refusont beaucoup de clients
-        - 👫 Recrutement Client : le seuil acceptable est fixé à 7.3%
+        - 👫 Recrutement Client : le seuil acceptable est fixé à 41.58%
             Nous recrutons le maximum de clients tout en étant rentable
 
     #### Sommaire

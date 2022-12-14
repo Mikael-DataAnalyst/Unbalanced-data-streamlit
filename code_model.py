@@ -333,7 +333,8 @@ def get_pipeline_smote(over_s = 0.1, under_s = 0.8, k =5):
                             under_s = [0.78,0.80,0.82]
                             best : 0.1 and 0.8 for best f2beta score
         best k : test with [2,3,4,5,6,7] 
-                k = 5 for the best f2beta score'''
+                k = 5 for the best f2beta score
+        balance 0 / 1 is 0.56 / 0.44'''
     over = SMOTE(sampling_strategy=over_s, k_neighbors=k, random_state=12)
     under = RandomUnderSampler(sampling_strategy = under_s, random_state=12)
     steps = [("over", over), ("under", under)]
@@ -419,12 +420,6 @@ def lgmb_model(train_df,test_df):
                objective='binary', random_state=314)
 
     
-    '''over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
-    under = RandomUnderSampler(sampling_strategy = 0.8, random_state=12)
-    pipeline = Pipeline([('over', over),
-                    ('under', under), 
-                    ])
-    train_x_sm, train_y_sm = pipeline.fit_resample(train_x, train_y)'''
     # reduce balance train
     pipeline_smote = get_pipeline_smote()
     train_x_sm , train_y_sm = pipeline_smote.fit_resample(train_x, train_y)
