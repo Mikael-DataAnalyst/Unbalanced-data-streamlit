@@ -5,6 +5,7 @@ import pickle
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score,accuracy_score, confusion_matrix, ConfusionMatrixDisplay,precision_recall_curve, make_scorer, roc_curve
+from sklearn.metrics import recall_score, f1_score,fbeta_score
 from sklearn.neighbors import BallTree
 import shap
 from contextlib import contextmanager
@@ -19,7 +20,7 @@ def timer(title):
     print("{} - done in {:.0f}s".format(title, time.time() - t0))
 
 def load_model():
-    with open("saved_data/model1.pkl", 'rb') as file:
+    with open("saved_data/model.pkl", 'rb') as file:
         model = pickle.load(file)
         return model
 
@@ -41,7 +42,9 @@ def get_data_train(new_train):
     feats = data.columns
     return data, y, feats
 
+# Values to calculate the business cost
 def get_scoring(new_train):
+    """Find the cost of a loan and the annuity of a loan"""
     annuity_mean = new_train["AMT_ANNUITY"].mean()
     loan_mean = new_train["AMT_CREDIT"].mean()
     return annuity_mean, loan_mean
@@ -49,8 +52,12 @@ def get_scoring(new_train):
 
 
 def results(y, y_pred,new_train):
-    print('Accuracy score for Testing Dataset = ', accuracy_score(y_pred, y))
-    print('Roc auc score for Testing Dataset = ', roc_auc_score(y_pred, y))
+    print('Accuracy score for Testing Dataset = ', accuracy_score(y,y_pred))
+    print('Roc auc score for Testing Dataset = ', roc_auc_score(y, y_pred))
+    print('Fbeta score for Testing Dataset = ', fbeta_score(y, y_pred, beta=2))
+    print('F1 score for Testing Dataset = ', f1_score(y, y_pred))
+    print('Recall score for Testing Dataset = ',recall_score(y, y_pred))
+
     annuity_mean, loan_mean = get_scoring(new_train)
     cf = confusion_matrix(y, y_pred)
     ConfusionMatrixDisplay(cf).plot()
@@ -61,8 +68,20 @@ def results(y, y_pred,new_train):
     save_money = tp * loan_mean
 
     print('Bon crédit accordé:', tn)
+    print('Perte de bons clients:', fp, 'soit', round(fp/(tn+fp)*100,2),'%' )
+    print('Mauvais crédit accordé:', fn, 'soit', round(fn/(fn+tp)*100,2),'%')
+    print("benefit : ", round(benefit,0))
+    print("Loose for credit refused :", round(loose,0))
+    print("save_money for credit refused : ", round(save_money,0))
 
 def get_threshold(data,y,model,new_train):
+    ''' Find the best threshold for 2 scoring :
+        - the most profitable (scoring1)
+            (True negative * annuity_mean) - (False negative * loan_mean)
+        - More customers and be profitable (scoring2)
+            ((True negative * annuity_mean) - (False negative * loan_mean)-(False positive * annuity_mean)
+            '''
+
     train_x, valid_x, train_y, valid_y = train_test_split(data, y, test_size=0.2, shuffle=True, stratify=y, random_state=1301)
     
     y_pred = model.predict(valid_x)
@@ -98,6 +117,7 @@ def get_threshold(data,y,model,new_train):
 
 
 def get_shap_values(model, data_test, data ,y):
+    #Extract the shap values and expected value of the model with a Tree explainer
     train_x, valid_x, train_y, valid_y = train_test_split(data, y, test_size=0.2, shuffle=True, stratify=y, random_state=1301)
     explainer = shap.TreeExplainer(model,data = train_x, model_output = "probability", feature_perturbation="interventional") 
     shap_values = explainer.shap_values(data_test)
@@ -110,6 +130,11 @@ def get_shap_values(model, data_test, data ,y):
 
 
 def get_dict_nn(data_test,new_train,model, shap_values):
+    ''' Find the 10 nearest neighboors of each customers on:
+            - prediction
+            - shap_values
+        return dictionnary off each customers and their nearest neighboors
+        '''
     data, y, feats = get_data_train(new_train)
     best_tresh_scoring1, best_tresh_scoring2 = get_threshold(data,y, model,new_train)
     client_list = data_test.index.to_list()
@@ -121,13 +146,15 @@ def get_dict_nn(data_test,new_train,model, shap_values):
     clients["pred_score_1"] = pred_score1
     clients["pred_score_2"] = pred_score2
     clients["prob_1"] = probs[:,1]
-
+    # Nearest prediction
     tree = BallTree(probs, leaf_size = 2)
     dist, nn_prob = tree.query(probs, k=10)
     nn_prob_list = nn_prob.tolist()
+    # Nearest shap_values
     tree = BallTree(shap_values, leaf_size = 2)
     dist, nn_shap_values = tree.query(shap_values, k=10)
     nn_shap_values_list = nn_shap_values.tolist()
+    # Create the dict to store the neighboors
     dict_nn = {}
     for client in clients["SK_ID_CURR"] :
         idx = client_list.index(client)
@@ -137,6 +164,7 @@ def get_dict_nn(data_test,new_train,model, shap_values):
     return best_tresh_scoring1, best_tresh_scoring2
 
 def rename_function(x):
+    # rename column for not having doubles
     if x["Table"]=="installments":
         return "INST_" + x["Row"]
     if x["Table"]=="bureau.csv":
@@ -153,6 +181,7 @@ def rename_function(x):
         return x["Row"] 
 
 def column_info():
+    # Description of the columns for glossary
     col_info = pd.read_csv("/Users/mikae/OneDrive/Documents/Formation/Data Scientist/Projet_7/data/HomeCredit_columns_description.csv",encoding = "ISO-8859-1")
     col_info = col_info[["Table","Row", "Description"]]
     col_info["Table"] = col_info["Table"].map(lambda x : x.split("_")[0])

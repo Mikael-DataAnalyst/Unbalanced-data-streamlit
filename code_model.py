@@ -12,6 +12,10 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.impute import SimpleImputer
 import re
 import pickle
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
 
 # modeling 
 from lightgbm import LGBMClassifier
@@ -311,6 +315,22 @@ def get_data(train_df):
     y = train["TARGET"]
     return data, y
 
+def get_pipeline_smote(over_s = 0.1, under_s = 0.8, k =5):
+    ''' Pipeline with over sampling with SMOTE
+        Undersampling with RandomUnderSampler
+        Sampling strategy : test with multiples value 
+                            over_s = [0.1,0.12,0.14,0.15]
+                            under_s = [0.78,0.80,0.82]
+                            best : 0.1 and 0.8 for best f2beta score
+        best k : test with [2,3,4,5,6,7] 
+                k = 5 for the best f2beta score'''
+    over = SMOTE(sampling_strategy=over_s, k_neighbors=k, random_state=12)
+    under = RandomUnderSampler(sampling_strategy = under_s, random_state=12)
+    steps = [("over", over), ("under", under)]
+    pipeline_smote = Pipeline(steps=steps)
+    pipeline = pipeline_smote
+    return pipeline
+
 # Select only important features
 def drop_feat(train_df,test_df, threshold=0.9):
     data, y = get_data(train_df)
@@ -327,9 +347,11 @@ def drop_feat(train_df,test_df, threshold=0.9):
         # Split into training and validation set
         #Create train and validation set
         train_x, valid_x, train_y, valid_y = train_test_split(data, y, test_size=0.2, shuffle=True, stratify=y, random_state=i)
-        
+        pipeline_smote = get_pipeline_smote()
+
+        train_x_sm , train_y_sm = pipeline_smote.fit_resample(train_x, train_y)
         # Train using early stopping
-        model_lgbm.fit(train_x, train_y, callbacks = callbacks, eval_set = [(valid_x, valid_y)], 
+        model_lgbm.fit(train_x_sm, train_y_sm, callbacks = callbacks, eval_set = [(valid_x, valid_y)], 
                 eval_metric = 'auc')
         
         # Record the feature importances
@@ -364,25 +386,42 @@ def lgmb_model(train_df,test_df):
     callbacks = [lgb.early_stopping(stopping_rounds = 100),
             #lgb.log_evaluation()
             ]
-    fit_params={"eval_metric" : 'auc', 
-                "eval_set" : [(valid_x,valid_y)],
-                'eval_names': ['valid'],
-                'callbacks' : callbacks,
-                'categorical_feature': 'auto'}
-    clf = LGBMClassifier(colsample_bytree=0.42665072497940254, max_depth=6, metric='None',
-               min_child_samples=464, min_child_weight=100.0, n_estimators=5000,
-               n_jobs=4, num_leaves=13, random_state=314, reg_alpha=0,
-               reg_lambda=0, subsample=0.7008050755353639, scale_pos_weight=1)
+    fit_params={"lgbm__eval_metric" : 'logloss', 
+                "lgbm__eval_set" : [(valid_x,valid_y)],
+                'lgbm__eval_names': ['valid'],
+                'lgbm__callbacks' : callbacks,
+                }
+
+    clf = lgb.LGBMClassifier(colsample_bytree=0.8754028264142053, max_depth=3,
+               min_child_samples=499, min_child_weight=10.0,
+               num_leaves=20, reg_alpha=1, reg_lambda=1,
+               scale_pos_weight=1, subsample=0.8860978450206372,
+               metric='logloss', n_estimators=5000, n_jobs=4,
+               objective='binary', random_state=314)
+    over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
+    under = RandomUnderSampler(sampling_strategy = 0.8, random_state=12)
+    pipeline = Pipeline([('over', over),
+                        ('under', under), 
+                        ('lgbm', clf)])
     
     #Create train and validation set
-    train_x, valid_x, train_y, valid_y = train_test_split(data, y, test_size=0.2, shuffle=True, stratify=y, random_state=1301)
-
-    clf.fit(train_x, train_y,**fit_params)
+    over = SMOTE(sampling_strategy=0.1, k_neighbors=5, random_state=12)
+    under = RandomUnderSampler(sampling_strategy = 0.8, random_state=12)
+    pipeline = Pipeline([('over', over),
+                    ('under', under), 
+                    ])
+    train_x_sm, train_y_sm = pipeline.fit_resample(train_x, train_y)
+    fit_params={"eval_metric" : 'logloss', 
+            "eval_set" : [(valid_x,valid_y)],
+            'eval_names': ['valid'],
+            'callbacks' : callbacks,
+            }
+    final_model = clf.fit(train_x_sm, train_y_sm,**fit_params)
 
     # Save model
-    pkl_filename = "saved_data/model1.pkl"
+    pkl_filename = "saved_data/model.pkl"
     with open(pkl_filename, 'wb') as file :
-        pickle.dump(clf, file)
+        pickle.dump(final_model, file)
 
     test = test_df.set_index(['SK_ID_CURR'])
     test = test.drop(train_df.columns[0], axis=1)
@@ -390,13 +429,15 @@ def lgmb_model(train_df,test_df):
     data_test = data_test.replace([np.inf, -np.inf], 0)
     # Empty array for test predictions
     test_predictions = np.zeros(data_test.shape[0])
-
-    test_predictions += clf.predict_proba(data_test, num_iteration=clf.best_iteration_)[:,1]
+    test_predictions += final_model.predict_proba(data_test)[:,1]
+    #test_predictions += final_model.predict_proba(data_test, num_iteration=final_model.best_iteration_)[:,1]
     submit = data_test.reset_index()[['SK_ID_CURR']]
     submit['TARGET'] = test_predictions
     submit.to_csv(submission_file_name, index = False)
 
 def get_info_client():
+    ''' get the information of customer before pre-processing'''
+
     application = pd.read_csv(path+'application_test.csv')
     bureau = pd.read_csv(path+"bureau.csv")
     info_client = application.join(bureau, how ="left", on="SK_ID_CURR", rsuffix="BURO")
@@ -472,7 +513,7 @@ def main(debug = False):
         lgmb_model(train_df,test_df)
 
 if __name__ == "__main__":
-    submission_file_name = "saved_data/submission_02.csv"
+    submission_file_name = "saved_data/submission_01.csv"
     with timer("Full model run"):
         main()
 
